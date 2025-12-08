@@ -97,8 +97,14 @@ type
   Locator* {.importcpp: "xercesc::Locator".} = object
   LocatorPtr* = ptr Locator
 
-proc getPublicId*(loc: LocatorPtr): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getPublicId())".}
-proc getSystemId*(loc: LocatorPtr): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getSystemId())".}
+proc getPublicId*(
+  loc: LocatorPtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getPublicId())".}
+
+proc getSystemId*(
+  loc: LocatorPtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getSystemId())".}
+
 proc getLineNumber*(loc: LocatorPtr): XMLSize {.importcpp: "#->getLineNumber()".}
 proc getColumnNumber*(loc: LocatorPtr): XMLSize {.importcpp: "#->getColumnNumber()".}
 
@@ -123,7 +129,9 @@ proc newMemBufInputSource*(
   byteCount: XMLSize,
   bufId: cstring,
   adoptBuffer: bool = false,
-): ptr MemBufInputSource {.importcpp: "new xercesc::MemBufInputSource((const XMLByte*)#, #, #, #)".}
+): ptr MemBufInputSource {.
+  importcpp: "new xercesc::MemBufInputSource((const XMLByte*)#, #, #, #)"
+.}
 
 proc deleteMemBufInputSource*(src: ptr MemBufInputSource) {.importcpp: "delete #".}
 

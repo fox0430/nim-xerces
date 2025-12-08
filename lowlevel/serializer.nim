@@ -51,7 +51,10 @@ proc setEncoding*(
   output: DOMLSOutputPtr, encoding: ptr XMLCh
 ) {.importcpp: "#->setEncoding(#)".}
 
-proc getEncoding*(output: DOMLSOutputPtr): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getEncoding())".}
+proc getEncoding*(
+  output: DOMLSOutputPtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getEncoding())".}
+
 {.pop.}
 
 # DOMConfiguration methods

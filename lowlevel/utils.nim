@@ -10,7 +10,10 @@ type XMLString* {.importcpp: "xercesc::XMLString".} = object
 # String conversion
 proc transcode*(s: cstring): ptr XMLCh {.importcpp: "xercesc::XMLString::transcode(#)".}
 proc transcode*(s: ptr XMLCh): cstring {.importcpp: "xercesc::XMLString::transcode(#)".}
-proc transcodeConst*(s: ConstXMLChPtr): cstring {.importcpp: "xercesc::XMLString::transcode(#)".}
+proc transcodeConst*(
+  s: ConstXMLChPtr
+): cstring {.importcpp: "xercesc::XMLString::transcode(#)".}
+
 proc release*(s: ptr ptr XMLCh) {.importcpp: "xercesc::XMLString::release(#)".}
 proc release*(s: ptr cstring) {.importcpp: "xercesc::XMLString::release(#)".}
 
