@@ -57,8 +57,14 @@ type
   DOMImplementationPtr* = ptr DOMImplementation
 
 # DOMNode methods
-proc getNodeName*(node: DOMNodePtr): ptr XMLCh {.importcpp: "#->getNodeName()".}
-proc getNodeValue*(node: DOMNodePtr): ptr XMLCh {.importcpp: "#->getNodeValue()".}
+proc getNodeName*(
+  node: DOMNodePtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getNodeName())".}
+
+proc getNodeValue*(
+  node: DOMNodePtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getNodeValue())".}
+
 proc getNodeType*(node: DOMNodePtr): DOMNodeType {.importcpp: "#->getNodeType()".}
 proc getParentNode*(node: DOMNodePtr): DOMNodePtr {.importcpp: "#->getParentNode()".}
 proc getChildNodes*(
@@ -82,7 +88,10 @@ proc getOwnerDocument*(
 
 proc hasChildNodes*(node: DOMNodePtr): bool {.importcpp: "#->hasChildNodes()".}
 proc hasAttributes*(node: DOMNodePtr): bool {.importcpp: "#->hasAttributes()".}
-proc getTextContent*(node: DOMNodePtr): ptr XMLCh {.importcpp: "#->getTextContent()".}
+proc getTextContent*(
+  node: DOMNodePtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getTextContent())".}
+
 proc setTextContent*(
   node: DOMNodePtr, textContent: ptr XMLCh
 ) {.importcpp: "#->setTextContent(#)".}
@@ -108,9 +117,17 @@ proc cloneNode*(
 ): DOMNodePtr {.importcpp: "#->cloneNode(#)".}
 
 # Namespace-related methods
-proc getNamespaceURI*(node: DOMNodePtr): ptr XMLCh {.importcpp: "#->getNamespaceURI()".}
-proc getPrefix*(node: DOMNodePtr): ptr XMLCh {.importcpp: "#->getPrefix()".}
-proc getLocalName*(node: DOMNodePtr): ptr XMLCh {.importcpp: "#->getLocalName()".}
+proc getNamespaceURI*(
+  node: DOMNodePtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getNamespaceURI())".}
+
+proc getPrefix*(
+  node: DOMNodePtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getPrefix())".}
+
+proc getLocalName*(
+  node: DOMNodePtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getLocalName())".}
 
 # DOMNodeList methods
 proc getLength*(list: DOMNodeListPtr): XMLSize {.importcpp: "#->getLength()".}
@@ -196,14 +213,17 @@ proc importNode*(
 ): DOMNodePtr {.importcpp: "#->importNode(#, #)".}
 
 # DOMElement methods
-proc getTagName*(elem: DOMElementPtr): ptr XMLCh {.importcpp: "#->getTagName()".}
+proc getTagName*(
+  elem: DOMElementPtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getTagName())".}
+
 proc getAttribute*(
   elem: DOMElementPtr, name: ptr XMLCh
-): ptr XMLCh {.importcpp: "#->getAttribute(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getAttribute(#))".}
 
 proc getAttributeNS*(
   elem: DOMElementPtr, namespaceURI: ptr XMLCh, localName: ptr XMLCh
-): ptr XMLCh {.importcpp: "#->getAttributeNS(#, #)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getAttributeNS(#, #))".}
 
 proc getAttributeNode*(
   elem: DOMElementPtr, name: ptr XMLCh
@@ -261,8 +281,14 @@ proc removeAttributeNode*(
 ): DOMAttrPtr {.importcpp: "#->removeAttributeNode(#)".}
 
 # DOMAttr methods
-proc getName*(attr: DOMAttrPtr): ptr XMLCh {.importcpp: "#->getName()".}
-proc getValue*(attr: DOMAttrPtr): ptr XMLCh {.importcpp: "#->getValue()".}
+proc getName*(
+  attr: DOMAttrPtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getName())".}
+
+proc getValue*(
+  attr: DOMAttrPtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getValue())".}
+
 proc setValue*(attr: DOMAttrPtr, value: ptr XMLCh) {.importcpp: "#->setValue(#)".}
 proc getOwnerElement*(
   attr: DOMAttrPtr
@@ -271,7 +297,10 @@ proc getOwnerElement*(
 proc getSpecified*(attr: DOMAttrPtr): bool {.importcpp: "#->getSpecified()".}
 
 # DOMText methods
-proc getData*(text: DOMTextPtr): ptr XMLCh {.importcpp: "#->getData()".}
+proc getData*(
+  text: DOMTextPtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getData())".}
+
 proc setData*(text: DOMTextPtr, data: ptr XMLCh) {.importcpp: "#->setData(#)".}
 proc getLength*(text: DOMTextPtr): XMLSize {.importcpp: "#->getLength()".}
 proc splitText*(
@@ -279,19 +308,25 @@ proc splitText*(
 ): DOMTextPtr {.importcpp: "#->splitText(#)".}
 
 # DOMComment methods
-proc getData*(comment: DOMCommentPtr): ptr XMLCh {.importcpp: "#->getData()".}
+proc getData*(
+  comment: DOMCommentPtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getData())".}
+
 proc setData*(comment: DOMCommentPtr, data: ptr XMLCh) {.importcpp: "#->setData(#)".}
 proc getLength*(comment: DOMCommentPtr): XMLSize {.importcpp: "#->getLength()".}
 
 # DOMDocumentType methods
-proc getName*(doctype: DOMDocumentTypePtr): ptr XMLCh {.importcpp: "#->getName()".}
+proc getName*(
+  doctype: DOMDocumentTypePtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getName())".}
+
 proc getPublicId*(
   doctype: DOMDocumentTypePtr
-): ptr XMLCh {.importcpp: "#->getPublicId()".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getPublicId())".}
 
 proc getSystemId*(
   doctype: DOMDocumentTypePtr
-): ptr XMLCh {.importcpp: "#->getSystemId()".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getSystemId())".}
 
 # DOMDocument memory management
 proc release*(doc: DOMDocumentPtr) {.importcpp: "#->release()".}
