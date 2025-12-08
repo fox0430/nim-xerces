@@ -56,6 +56,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install xerces-c
+          echo "CPLUS_INCLUDE_PATH=$(brew --prefix)/include" >> $GITHUB_ENV
+          echo "LIBRARY_PATH=$(brew --prefix)/lib" >> $GITHUB_ENV
 
       - name: Cache nimble
         id: cache-nimble
