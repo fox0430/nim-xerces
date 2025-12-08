@@ -7,6 +7,11 @@ Nim bindings for [Apache Xerces-C++](https://xerces.apache.org/xerces-c/).
 - [Nim](https://nim-lang.org) >= 2.0.6
 - [Apache Xerces-C++](https://xerces.apache.org/xerces-c/)
 
+## Installtion
+```bash
+nimble install xerces
+```
+
 ## Usage
 
 ```nim
