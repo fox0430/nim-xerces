@@ -236,7 +236,7 @@ iterator pairs*(
   if attrs != nil:
     let len = attrs.getLength()
     for i in 0 ..< len:
-      yield (i, attrs.getQName(i), attrs.getValue(i))
+      yield (index: XMLSize(i), qname: attrs.getQName(i), value: attrs.getValue(i))
 
 # NimContentHandler - High-level SAX parsing with Nim callbacks
 
