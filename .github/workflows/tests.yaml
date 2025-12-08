@@ -82,6 +82,9 @@ jobs:
       - name: Run tests
         run: nimble test -y
 
+      - name: Install nim-xerces
+        run: nimble install
+
       - name: Run example
         run: |
           nim cpp examples/basic_parsing.nim
