@@ -1,0 +1,12 @@
+# Package
+
+version = "0.1.0"
+author = "fox0430"
+description = "Nim bindings for Apache Xerces-C++"
+license = "MIT"
+installDirs = @["lowlevel"]
+backend = "cpp"
+
+# Dependencies
+
+requires "nim >= 2.0.6"
