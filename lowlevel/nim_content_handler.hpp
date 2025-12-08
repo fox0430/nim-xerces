@@ -6,46 +6,46 @@
 #include <xercesc/sax/Locator.hpp>
 #include <xercesc/util/XMLString.hpp>
 
-// Callback function types for Nim
+// Callback function types for Nim (non-const to match Nim's cstring)
 extern "C" {
     typedef void (*NimStartDocumentCallback)(void* userData);
     typedef void (*NimEndDocumentCallback)(void* userData);
     typedef void (*NimStartElementCallback)(
         void* userData,
-        const char* uri,
-        const char* localName,
-        const char* qName,
-        const xercesc::Attributes* attrs
+        char* uri,
+        char* localName,
+        char* qName,
+        xercesc::Attributes* attrs
     );
     typedef void (*NimEndElementCallback)(
         void* userData,
-        const char* uri,
-        const char* localName,
-        const char* qName
+        char* uri,
+        char* localName,
+        char* qName
     );
     typedef void (*NimCharactersCallback)(
         void* userData,
-        const char* chars,
+        char* chars,
         XMLSize_t length
     );
     typedef void (*NimIgnorableWhitespaceCallback)(
         void* userData,
-        const char* chars,
+        char* chars,
         XMLSize_t length
     );
     typedef void (*NimProcessingInstructionCallback)(
         void* userData,
-        const char* target,
-        const char* data
+        char* target,
+        char* data
     );
     typedef void (*NimStartPrefixMappingCallback)(
         void* userData,
-        const char* prefix,
-        const char* uri
+        char* prefix,
+        char* uri
     );
     typedef void (*NimEndPrefixMappingCallback)(
         void* userData,
-        const char* prefix
+        char* prefix
     );
 }
 
@@ -117,6 +117,12 @@ public:
         if (onEndDocument_) onEndDocument_(userData_);
     }
 
+    // Helper for empty string fallback (avoids const_cast on literal)
+    static char* emptyStr(char* s) {
+        static char empty[] = "";
+        return s ? s : empty;
+    }
+
     void startElement(
         const XMLCh* const uri,
         const XMLCh* const localName,
@@ -127,7 +133,7 @@ public:
             char* cUri = transcodeToC(uri);
             char* cLocalName = transcodeToC(localName);
             char* cQName = transcodeToC(qName);
-            onStartElement_(userData_, cUri ? cUri : "", cLocalName ? cLocalName : "", cQName ? cQName : "", &attrs);
+            onStartElement_(userData_, emptyStr(cUri), emptyStr(cLocalName), emptyStr(cQName), const_cast<xercesc::Attributes*>(&attrs));
             releaseTranscoded(cUri);
             releaseTranscoded(cLocalName);
             releaseTranscoded(cQName);
@@ -143,7 +149,7 @@ public:
             char* cUri = transcodeToC(uri);
             char* cLocalName = transcodeToC(localName);
             char* cQName = transcodeToC(qName);
-            onEndElement_(userData_, cUri ? cUri : "", cLocalName ? cLocalName : "", cQName ? cQName : "");
+            onEndElement_(userData_, emptyStr(cUri), emptyStr(cLocalName), emptyStr(cQName));
             releaseTranscoded(cUri);
             releaseTranscoded(cLocalName);
             releaseTranscoded(cQName);
@@ -153,7 +159,7 @@ public:
     void characters(const XMLCh* const chars, const XMLSize_t length) override {
         if (onCharacters_) {
             char* cChars = transcodeToC(chars);
-            onCharacters_(userData_, cChars ? cChars : "", length);
+            onCharacters_(userData_, emptyStr(cChars), length);
             releaseTranscoded(cChars);
         }
     }
@@ -161,7 +167,7 @@ public:
     void ignorableWhitespace(const XMLCh* const chars, const XMLSize_t length) override {
         if (onIgnorableWhitespace_) {
             char* cChars = transcodeToC(chars);
-            onIgnorableWhitespace_(userData_, cChars ? cChars : "", length);
+            onIgnorableWhitespace_(userData_, emptyStr(cChars), length);
             releaseTranscoded(cChars);
         }
     }
@@ -173,7 +179,7 @@ public:
         if (onProcessingInstruction_) {
             char* cTarget = transcodeToC(target);
             char* cData = transcodeToC(data);
-            onProcessingInstruction_(userData_, cTarget ? cTarget : "", cData ? cData : "");
+            onProcessingInstruction_(userData_, emptyStr(cTarget), emptyStr(cData));
             releaseTranscoded(cTarget);
             releaseTranscoded(cData);
         }
@@ -186,7 +192,7 @@ public:
         if (onStartPrefixMapping_) {
             char* cPrefix = transcodeToC(prefix);
             char* cUri = transcodeToC(uri);
-            onStartPrefixMapping_(userData_, cPrefix ? cPrefix : "", cUri ? cUri : "");
+            onStartPrefixMapping_(userData_, emptyStr(cPrefix), emptyStr(cUri));
             releaseTranscoded(cPrefix);
             releaseTranscoded(cUri);
         }
@@ -195,7 +201,7 @@ public:
     void endPrefixMapping(const XMLCh* const prefix) override {
         if (onEndPrefixMapping_) {
             char* cPrefix = transcodeToC(prefix);
-            onEndPrefixMapping_(userData_, cPrefix ? cPrefix : "");
+            onEndPrefixMapping_(userData_, emptyStr(cPrefix));
             releaseTranscoded(cPrefix);
         }
     }

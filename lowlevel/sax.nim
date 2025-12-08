@@ -1,4 +1,5 @@
-import types, utils
+import types
+import utils
 
 # SAX2 types
 {.push header: "<xercesc/sax2/SAX2XMLReader.hpp>".}
@@ -45,31 +46,31 @@ type
 proc getLength*(attrs: AttributesPtr): XMLSize {.importcpp: "#->getLength()".}
 proc getURI*(
   attrs: AttributesPtr, index: XMLSize
-): ptr XMLCh {.importcpp: "#->getURI(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getURI(#))".}
 
 proc getLocalName*(
   attrs: AttributesPtr, index: XMLSize
-): ptr XMLCh {.importcpp: "#->getLocalName(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getLocalName(#))".}
 
 proc getQName*(
   attrs: AttributesPtr, index: XMLSize
-): ptr XMLCh {.importcpp: "#->getQName(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getQName(#))".}
 
 proc getType*(
   attrs: AttributesPtr, index: XMLSize
-): ptr XMLCh {.importcpp: "#->getType(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getType(#))".}
 
 proc getValue*(
   attrs: AttributesPtr, index: XMLSize
-): ptr XMLCh {.importcpp: "#->getValue(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getValue(#))".}
 
 proc getValueByQName*(
   attrs: AttributesPtr, qName: ptr XMLCh
-): ptr XMLCh {.importcpp: "#->getValue(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getValue(#))".}
 
 proc getValueByName*(
   attrs: AttributesPtr, uri: ptr XMLCh, localName: ptr XMLCh
-): ptr XMLCh {.importcpp: "#->getValue(#, #)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getValue(#, #))".}
 
 proc getIndex*(
   attrs: AttributesPtr, uri: ptr XMLCh, localName: ptr XMLCh
@@ -81,11 +82,11 @@ proc getIndexByQName*(
 
 proc getTypeByQName*(
   attrs: AttributesPtr, qName: ptr XMLCh
-): ptr XMLCh {.importcpp: "#->getType(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getType(#))".}
 
 proc getTypeByName*(
   attrs: AttributesPtr, uri: ptr XMLCh, localName: ptr XMLCh
-): ptr XMLCh {.importcpp: "#->getType(#, #)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getType(#, #))".}
 
 {.pop.}
 
@@ -96,8 +97,8 @@ type
   Locator* {.importcpp: "xercesc::Locator".} = object
   LocatorPtr* = ptr Locator
 
-proc getPublicId*(loc: LocatorPtr): ptr XMLCh {.importcpp: "#->getPublicId()".}
-proc getSystemId*(loc: LocatorPtr): ptr XMLCh {.importcpp: "#->getSystemId()".}
+proc getPublicId*(loc: LocatorPtr): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getPublicId())".}
+proc getSystemId*(loc: LocatorPtr): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getSystemId())".}
 proc getLineNumber*(loc: LocatorPtr): XMLSize {.importcpp: "#->getLineNumber()".}
 proc getColumnNumber*(loc: LocatorPtr): XMLSize {.importcpp: "#->getColumnNumber()".}
 
@@ -122,7 +123,7 @@ proc newMemBufInputSource*(
   byteCount: XMLSize,
   bufId: cstring,
   adoptBuffer: bool = false,
-): ptr MemBufInputSource {.importcpp: "new xercesc::MemBufInputSource(#, #, #, #)".}
+): ptr MemBufInputSource {.importcpp: "new xercesc::MemBufInputSource((const XMLByte*)#, #, #, #)".}
 
 proc deleteMemBufInputSource*(src: ptr MemBufInputSource) {.importcpp: "delete #".}
 
@@ -251,7 +252,7 @@ type
   NimContentHandler* {.importcpp: "NimContentHandler", header: nimContentHandlerHeader.} = object
   NimContentHandlerPtr* = ptr NimContentHandler
 
-# Callback types matching C++
+# Callback types matching C++ (using non-const to match Nim's cstring)
 type
   StartDocumentCallback* = proc(userData: pointer) {.cdecl.}
   EndDocumentCallback* = proc(userData: pointer) {.cdecl.}
