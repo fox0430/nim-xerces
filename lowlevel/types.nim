@@ -1,7 +1,4 @@
-when defined(windows):
-  {.passL: "-lxerces-c_3".}
-else:
-  {.passL: "-lxerces-c".}
+{.passL: "-lxerces-c".}
 
 type
   XMLCh* {.importcpp: "XMLCh", header: "<xercesc/util/XercesDefs.hpp>".} = uint16

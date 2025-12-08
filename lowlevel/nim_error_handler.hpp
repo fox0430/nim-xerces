@@ -70,8 +70,9 @@ public:
         return i < errors_.size() ? errors_[i].level : -1;
     }
 
-    const char* getErrorMessage(size_t i) const {
-        return i < errors_.size() ? errors_[i].message.c_str() : "";
+    char* getErrorMessage(size_t i) const {
+        static char empty[] = "";
+        return i < errors_.size() ? const_cast<char*>(errors_[i].message.c_str()) : empty;
     }
 
     int getErrorLine(size_t i) const {

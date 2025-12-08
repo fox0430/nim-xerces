@@ -53,7 +53,7 @@ proc getNumberValue*(
 
 proc getStringValue*(
   result: DOMXPathResultPtr
-): ptr XMLCh {.importcpp: "#->getStringValue()".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getStringValue())".}
 
 proc getNodeValue*(
   result: DOMXPathResultPtr
@@ -84,11 +84,11 @@ type
 
 proc lookupNamespaceURI*(
   resolver: DOMXPathNSResolverPtr, prefix: ptr XMLCh
-): ptr XMLCh {.importcpp: "#->lookupNamespaceURI(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->lookupNamespaceURI(#))".}
 
 proc lookupPrefix*(
   resolver: DOMXPathNSResolverPtr, namespaceURI: ptr XMLCh
-): ptr XMLCh {.importcpp: "#->lookupPrefix(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->lookupPrefix(#))".}
 
 proc addNamespaceBinding*(
   resolver: DOMXPathNSResolverPtr, prefix: ptr XMLCh, uri: ptr XMLCh

@@ -24,7 +24,7 @@ type
 proc release*(serializer: DOMLSSerializerPtr) {.importcpp: "#->release()".}
 proc writeToString*(
   serializer: DOMLSSerializerPtr, node: DOMNodePtr
-): ptr XMLCh {.importcpp: "#->writeToString(#)".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->writeToString(#))".}
 
 proc getDomConfig*(
   serializer: DOMLSSerializerPtr
@@ -36,7 +36,7 @@ proc setNewLine*(
 
 proc getNewLine*(
   serializer: DOMLSSerializerPtr
-): ptr XMLCh {.importcpp: "#->getNewLine()".}
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getNewLine())".}
 
 {.pop.}
 
@@ -51,7 +51,10 @@ proc setEncoding*(
   output: DOMLSOutputPtr, encoding: ptr XMLCh
 ) {.importcpp: "#->setEncoding(#)".}
 
-proc getEncoding*(output: DOMLSOutputPtr): ptr XMLCh {.importcpp: "#->getEncoding()".}
+proc getEncoding*(
+  output: DOMLSOutputPtr
+): ptr XMLCh {.importcpp: "const_cast<XMLCh*>(#->getEncoding())".}
+
 {.pop.}
 
 # DOMConfiguration methods
