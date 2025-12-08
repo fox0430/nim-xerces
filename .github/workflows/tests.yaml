@@ -50,7 +50,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install xerces-c
+          sudo apt-get install libxerces-c-dev
 
       - name: Install xerces (macOS)
         if: runner.os == 'macOS'
