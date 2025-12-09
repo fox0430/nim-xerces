@@ -375,3 +375,133 @@ proc setErrorHandler*(parser: XercesDOMParserPtr, handler: XercesErrorHandler) =
   ## Set an error handler on the parser to collect parse errors
   if handler.impl != nil:
     parser.setErrorHandler(handler.impl.toErrorHandler())
+
+# XSD Schema Validation
+
+type XsdValidationResult* = object
+  isValid*: bool
+  errors*: seq[ParseError]
+
+proc validateXMLWithSchema*(
+    xmlContent: string, schemaLocations: openArray[(string, string)]
+): XsdValidationResult =
+  ## Validate XML content against XSD schemas.
+  ## schemaLocations is a sequence of (namespace, schemaPath) pairs.
+  ## For schemas without namespace, use empty string as namespace.
+  ##
+  ## Example:
+  ##   let result = validateXMLWithSchema(xml, [
+  ##     ("urn:example:namespace", "/path/to/schema.xsd")
+  ##   ])
+  let parser = newXercesDOMParser()
+  defer:
+    deleteXercesDOMParser(parser)
+
+  # Enable validation
+  parser.setValidationScheme(Val_Always)
+  parser.setDoNamespaces(true)
+  parser.setDoSchema(true)
+  parser.setValidationSchemaFullChecking(true)
+  parser.setHandleMultipleImports(true)
+
+  # Build schema location string
+  var schemaLocationStr = ""
+  var noNsSchemaLocation = ""
+  for (ns, path) in schemaLocations:
+    if ns.len == 0:
+      noNsSchemaLocation = path
+    else:
+      if schemaLocationStr.len > 0:
+        schemaLocationStr.add " "
+      schemaLocationStr.add ns & " " & path
+
+  if schemaLocationStr.len > 0:
+    parser.setExternalSchemaLocation(schemaLocationStr.cstring)
+  if noNsSchemaLocation.len > 0:
+    parser.setExternalNoNamespaceSchemaLocation(noNsSchemaLocation.cstring)
+
+  # Set up error handler
+  let errorHandler = newXercesErrorHandler()
+  parser.setErrorHandler(errorHandler)
+
+  # Parse from memory
+  let src = newMemBufInputSource(
+    cast[ptr XMLByte](xmlContent.cstring), xmlContent.len.XMLSize, "xmlBuffer"
+  )
+  defer:
+    deleteMemBufInputSource(src)
+
+  let parseResult = safeParse(parser, src)
+  if parseResult.isErr:
+    result.isValid = false
+    result.errors.add(
+      ParseError(
+        level: pelFatalError,
+        message: parseResult.errorMessage,
+        line: parseResult.line,
+        column: parseResult.column,
+      )
+    )
+    return
+
+  # Collect validation errors
+  for err in errorHandler:
+    result.errors.add(err)
+
+  result.isValid = not errorHandler.hasErrors() and not errorHandler.hasFatalErrors()
+
+proc validateXMLFileWithSchema*(
+    xmlPath: string, schemaLocations: openArray[(string, string)]
+): XsdValidationResult =
+  ## Validate an XML file against XSD schemas.
+  ## schemaLocations is a sequence of (namespace, schemaPath) pairs.
+  let parser = newXercesDOMParser()
+  defer:
+    deleteXercesDOMParser(parser)
+
+  # Enable validation
+  parser.setValidationScheme(Val_Always)
+  parser.setDoNamespaces(true)
+  parser.setDoSchema(true)
+  parser.setValidationSchemaFullChecking(true)
+  parser.setHandleMultipleImports(true)
+
+  # Build schema location string
+  var schemaLocationStr = ""
+  var noNsSchemaLocation = ""
+  for (ns, path) in schemaLocations:
+    if ns.len == 0:
+      noNsSchemaLocation = path
+    else:
+      if schemaLocationStr.len > 0:
+        schemaLocationStr.add " "
+      schemaLocationStr.add ns & " " & path
+
+  if schemaLocationStr.len > 0:
+    parser.setExternalSchemaLocation(schemaLocationStr.cstring)
+  if noNsSchemaLocation.len > 0:
+    parser.setExternalNoNamespaceSchemaLocation(noNsSchemaLocation.cstring)
+
+  # Set up error handler
+  let errorHandler = newXercesErrorHandler()
+  parser.setErrorHandler(errorHandler)
+
+  # Parse file
+  let parseResult = safeParse(parser, xmlPath)
+  if parseResult.isErr:
+    result.isValid = false
+    result.errors.add(
+      ParseError(
+        level: pelFatalError,
+        message: parseResult.errorMessage,
+        line: parseResult.line,
+        column: parseResult.column,
+      )
+    )
+    return
+
+  # Collect validation errors
+  for err in errorHandler:
+    result.errors.add(err)
+
+  result.isValid = not errorHandler.hasErrors() and not errorHandler.hasFatalErrors()
