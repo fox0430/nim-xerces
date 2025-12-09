@@ -117,6 +117,15 @@ proc getCreateCommentNodes*(
   parser: XercesDOMParserPtr
 ): bool {.importcpp: "#->getCreateCommentNodes()".}
 
+# External schema location settings
+proc setExternalSchemaLocation*(
+  parser: XercesDOMParserPtr, schemaLocation: cstring
+) {.importcpp: "#->setExternalSchemaLocation(#)".}
+
+proc setExternalNoNamespaceSchemaLocation*(
+  parser: XercesDOMParserPtr, schemaLocation: cstring
+) {.importcpp: "#->setExternalNoNamespaceSchemaLocation(#)".}
+
 # Reset
 proc resetDocumentPool*(
   parser: XercesDOMParserPtr

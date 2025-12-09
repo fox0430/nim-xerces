@@ -5,6 +5,7 @@ import lowlevel/xpath
 import lowlevel/utils
 
 const testDataPath = currentSourcePath().parentDir() / "test_data.xml"
+const testSchemaPath = currentSourcePath().parentDir() / "test_schema.xsd"
 
 const testXml =
   """<?xml version="1.0" encoding="UTF-8"?>
@@ -2106,3 +2107,114 @@ suite "Safe Parse Extended Tests":
     withXerces:
       let result = safeParseXMLFile("")
       check result.isErr
+
+suite "XSD Schema Validation Tests":
+  const validLibraryXml =
+    """<?xml version="1.0" encoding="UTF-8"?>
+<library>
+  <book id="1" category="fiction">
+    <title>Test Book</title>
+    <author>Test Author</author>
+    <year>2020</year>
+  </book>
+</library>"""
+
+  const invalidLibraryXml =
+    """<?xml version="1.0" encoding="UTF-8"?>
+<library>
+  <book id="1" category="fiction">
+    <title>Test Book</title>
+    <author>Test Author</author>
+    <year>invalid-year</year>
+  </book>
+</library>"""
+
+  const missingRequiredAttrXml =
+    """<?xml version="1.0" encoding="UTF-8"?>
+<library>
+  <book id="1">
+    <title>Test Book</title>
+    <author>Test Author</author>
+    <year>2020</year>
+  </book>
+</library>"""
+
+  const wrongElementOrderXml =
+    """<?xml version="1.0" encoding="UTF-8"?>
+<library>
+  <book id="1" category="fiction">
+    <author>Test Author</author>
+    <title>Test Book</title>
+    <year>2020</year>
+  </book>
+</library>"""
+
+  test "validateXMLWithSchema - valid XML":
+    withXerces:
+      let result = validateXMLWithSchema(validLibraryXml, [("", testSchemaPath)])
+      check result.isValid
+      check result.errors.len == 0
+
+  test "validateXMLWithSchema - invalid year type":
+    withXerces:
+      let result = validateXMLWithSchema(invalidLibraryXml, [("", testSchemaPath)])
+      check not result.isValid
+      check result.errors.len > 0
+
+  test "validateXMLWithSchema - missing required attribute":
+    withXerces:
+      let result = validateXMLWithSchema(missingRequiredAttrXml, [("", testSchemaPath)])
+      check not result.isValid
+      check result.errors.len > 0
+
+  test "validateXMLWithSchema - wrong element order":
+    withXerces:
+      let result = validateXMLWithSchema(wrongElementOrderXml, [("", testSchemaPath)])
+      check not result.isValid
+      check result.errors.len > 0
+
+  test "validateXMLFileWithSchema - valid file":
+    withXerces:
+      let result = validateXMLFileWithSchema(testDataPath, [("", testSchemaPath)])
+      check result.isValid
+      check result.errors.len == 0
+
+  test "validateXMLFileWithSchema - non-existent file":
+    withXerces:
+      let result =
+        validateXMLFileWithSchema("/non/existent/file.xml", [("", testSchemaPath)])
+      check not result.isValid
+      check result.errors.len > 0
+
+  test "validateXMLWithSchema - error details":
+    withXerces:
+      let result = validateXMLWithSchema(invalidLibraryXml, [("", testSchemaPath)])
+      check not result.isValid
+      for err in result.errors:
+        check err.message.len > 0
+        check err.line > 0
+
+  test "setExternalSchemaLocation low-level API":
+    withXerces:
+      let parser = newXercesDOMParser()
+      defer:
+        deleteXercesDOMParser(parser)
+
+      parser.setValidationScheme(Val_Always)
+      parser.setDoNamespaces(true)
+      parser.setDoSchema(true)
+      parser.setExternalNoNamespaceSchemaLocation(testSchemaPath.cstring)
+
+      let errorHandler = newXercesErrorHandler()
+      defer:
+        errorHandler.destroy()
+      parser.setErrorHandler(errorHandler)
+
+      let src = newMemBufInputSource(
+        cast[ptr XMLByte](validLibraryXml.cstring), validLibraryXml.len.XMLSize, "test"
+      )
+      defer:
+        deleteMemBufInputSource(src)
+
+      parser.parse(cast[InputSourcePtr](src))
+      check not errorHandler.hasErrors()
